@@ -43,4 +43,7 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-auth")
+
+    // Cloud Firestore Database Library যুক্ত করা হলো
+    implementation("com.google.firebase:firebase-firestore")
 }

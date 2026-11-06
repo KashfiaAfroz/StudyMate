@@ -1,9 +1,8 @@
 package com.kashfia.studymate;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,62 +14,77 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText etLoginEmail, etLoginPassword;
+    private EditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvRegisterLink;
+    private TextView tvRegisterRedirect;
     private FirebaseAuth mAuth;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Firebase Auth initialization
         mAuth = FirebaseAuth.getInstance();
+        sharedPreferences = getSharedPreferences("StudyMatePrefs", MODE_PRIVATE);
 
-        // UI Views binding
-        etLoginEmail = findViewById(R.id.etLoginEmail);
-        etLoginPassword = findViewById(R.id.etLoginPassword);
+        etEmail = findViewById(R.id.etLoginEmail);
+        etPassword = findViewById(R.id.etLoginPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        tvRegisterLink = findViewById(R.id.tvRegisterLink);
+        tvRegisterRedirect = findViewById(R.id.tvRegisterRedirect);
 
-        // Login Button Click Action
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = etLoginEmail.getText().toString().trim();
-                String password = etLoginPassword.getText().toString().trim();
+        // Check if user already logged in via Firebase / SharedPreferences
+        if (mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
 
-                if (TextUtils.isEmpty(email)) {
-                    etLoginEmail.setError("Email is required");
-                    return;
-                }
+        // Login Button Click Listener
+        btnLogin.setOnClickListener(v -> {
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-                if (TextUtils.isEmpty(password)) {
-                    etLoginPassword.setError("Password is required");
-                    return;
-                }
-
-                // Firebase Login Authentication
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-
-                                // সফল লগইন হওয়ার পর MainActivity তে যাওয়ার কোড
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish(); // যাতে ব্যাক প্রেস করলে আবার লগইন পেজে ফিরে না আসে
-
-                            } else {
-                                Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
+            // Input Validation checks
+            if (email.isEmpty()) {
+                etEmail.setError("Email is required");
+                etEmail.requestFocus();
+                return;
             }
+
+            if (password.isEmpty()) {
+                etPassword.setError("Password is required");
+                etPassword.requestFocus();
+                return;
+            }
+
+            if (password.length() < 6) {
+                etPassword.setError("Password must be at least 6 characters");
+                etPassword.requestFocus();
+                return;
+            }
+
+            // Firebase Authentication Login
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Save login state using SharedPreferences
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("isLoggedIn", true);
+                            editor.putString("userEmail", email);
+                            editor.apply();
+
+                            Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
         });
 
-        // Redirect to Register Activity if user has no account
-        tvRegisterLink.setOnClickListener(v -> {
+        // Redirect to Register Activity
+        tvRegisterRedirect.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
