@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create New Note"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#009688"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/etNoteTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Note Title"
+            android:padding="10dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/etNoteContent"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:gravity="top"
+            android:hint="Write your note here..."
+            android:padding="10dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnAddNoteImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Attach Image from Gallery"
+            android:backgroundTint="#FF9800"
+            android:textColor="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp" />
+
+        <ImageView
+            android:id="@+id/ivAddNoteImage"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnSaveNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Note"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btnCancelNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:backgroundTint="#757575"
+            android:textColor="@android:color/white"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>

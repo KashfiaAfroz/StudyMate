@@ -1,7 +1,6 @@
 package com.kashfia.studymate;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,8 +16,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
     private TextView tvRegisterRedirect;
+
     private FirebaseAuth mAuth;
-    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,67 +25,57 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-        sharedPreferences = getSharedPreferences("StudyMatePrefs", MODE_PRIVATE);
 
-        etEmail = findViewById(R.id.etLoginEmail);
-        etPassword = findViewById(R.id.etLoginPassword);
+        // XML ফাইলের সঠিক আইডি (etEmail ও etPassword) এখানে যুক্ত করা হলো
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         tvRegisterRedirect = findViewById(R.id.tvRegisterRedirect);
 
-        // Check if user already logged in via Firebase / SharedPreferences
-        if (mAuth.getCurrentUser() != null) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
+        if (btnLogin != null) {
+            btnLogin.setOnClickListener(v -> loginUser());
         }
 
-        // Login Button Click Listener
-        btnLogin.setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
-            String password = etPassword.getText().toString().trim();
+        if (tvRegisterRedirect != null) {
+            tvRegisterRedirect.setOnClickListener(v -> {
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+            });
+        }
+    }
 
-            // Input Validation checks
-            if (email.isEmpty()) {
-                etEmail.setError("Email is required");
-                etEmail.requestFocus();
-                return;
-            }
+    private void loginUser() {
+        if (etEmail == null || etPassword == null) return;
 
-            if (password.isEmpty()) {
-                etPassword.setError("Password is required");
-                etPassword.requestFocus();
-                return;
-            }
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
 
-            if (password.length() < 6) {
-                etPassword.setError("Password must be at least 6 characters");
-                etPassword.requestFocus();
-                return;
-            }
+        if (email.isEmpty()) {
+            etEmail.setError("Please enter email");
+            etEmail.requestFocus();
+            return;
+        }
 
-            // Firebase Authentication Login
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Save login state using SharedPreferences
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("isLoggedIn", true);
-                            editor.putString("userEmail", email);
-                            editor.apply();
+        if (password.isEmpty()) {
+            etPassword.setError("Please enter password");
+            etPassword.requestFocus();
+            return;
+        }
 
-                            Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-        });
+        btnLogin.setEnabled(false);
+        btnLogin.setText("Logging in...");
 
-        // Redirect to Register Activity
-        tvRegisterRedirect.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, TasksActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(LoginActivity.this, "Login Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Login");
+                });
     }
 }

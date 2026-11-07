@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exam Countdown List"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#6200EE"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp" />
+
+    <EditText
+        android:id="@+id/etExamName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Exam Name (e.g., Graphics Lab Final)"
+        android:textSize="14sp"
+        android:padding="10dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etExamDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Exam Date (DD-MM-YYYY)"
+        android:textSize="14sp"
+        android:padding="10dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/btnSaveExam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="+ Add Exam Countdown"
+        android:backgroundTint="#FF9800"
+        android:textColor="@android:color/white"
+        android:padding="10dp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- RecyclerView for Exam List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewExam"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/btnBackHome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Back to Home"
+        android:backgroundTint="#6200EE"
+        android:textColor="@android:color/white"
+        android:padding="12dp" />
+
+    <include
+        layout="@layout/layout_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

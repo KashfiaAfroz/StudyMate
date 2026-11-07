@@ -2,164 +2,182 @@ package com.kashfia.studymate;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Base64;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView tvProfileEmail;
-    private Button btnBackToHome, btnGallery, btnCamera, btnOpenBrowser, btnOpenEmail;
-    private ImageView ivProfilePic;
-    private FirebaseAuth mAuth;
+    private ImageView ivProfileImage;
+    private EditText etName, etFatherName, etMotherName, etHobby;
+    private EditText etEmail, etPhone, etBirthday, etBloodGroup, etParentContact, etPresentAddress, etPermanentAddress, etBatch, etRoll, etDepartment, etUniversity;
+    private Button btnSaveProfile;
 
-    private static final int REQUEST_IMAGE_GALLERY = 101;
-    private static final int REQUEST_IMAGE_CAMERA = 102;
-    private static final String PREF_NAME = "StudyMatePrefs";
-    private static final String KEY_PROFILE_IMAGE = "profile_image_base64";
+    private static final String PREF_NAME = "StudyMateProfilePrefs";
+    private Uri profileImageUri = null;
+
+    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    profileImageUri = result.getData().getData();
+                    if (profileImageUri != null) {
+                        try {
+                            getContentResolver().takePersistableUriPermission(profileImageUri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        ivProfileImage.setImageURI(profileImageUri);
+                        saveImageUriToPrefs(profileImageUri.toString());
+                    }
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        tvProfileEmail = findViewById(R.id.tvProfileEmail);
-        btnBackToHome = findViewById(R.id.btnBackToHome);
-        btnGallery = findViewById(R.id.btnGallery);
-        btnCamera = findViewById(R.id.btnCamera);
-        btnOpenBrowser = findViewById(R.id.btnOpenBrowser);
-        btnOpenEmail = findViewById(R.id.btnOpenEmail);
-        ivProfilePic = findViewById(R.id.ivProfilePic);
+        ivProfileImage = findViewById(R.id.ivProfileImage);
 
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        // New Fields
+        etName = findViewById(R.id.etProfileName);
+        etFatherName = findViewById(R.id.etProfileFatherName);
+        etMotherName = findViewById(R.id.etProfileMotherName);
+        etHobby = findViewById(R.id.etProfileHobby);
 
-        if (currentUser != null && currentUser.getEmail() != null) {
-            tvProfileEmail.setText("Email: " + currentUser.getEmail());
+        // Existing Fields
+        etEmail = findViewById(R.id.etProfileEmail);
+        etPhone = findViewById(R.id.etProfilePhone);
+        etBirthday = findViewById(R.id.etProfileBirthday);
+        etBloodGroup = findViewById(R.id.etProfileBloodGroup);
+        etParentContact = findViewById(R.id.etProfileParentContact);
+        etPresentAddress = findViewById(R.id.etProfilePresentAddress);
+        etPermanentAddress = findViewById(R.id.etProfilePermanentAddress);
+        etBatch = findViewById(R.id.etProfileBatch);
+        etRoll = findViewById(R.id.etProfileRoll);
+        etDepartment = findViewById(R.id.etProfileDepartment);
+        etUniversity = findViewById(R.id.etProfileUniversity);
+        btnSaveProfile = findViewById(R.id.btnSaveProfile);
+
+        loadProfileData();
+
+        ivProfileImage.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+        });
+
+        if (btnSaveProfile != null) {
+            btnSaveProfile.setOnClickListener(v -> {
+                saveProfileData();
+                Toast.makeText(this, "Profile Saved Successfully!", Toast.LENGTH_SHORT).show();
+            });
         }
 
-        // Load saved profile image from SharedPreferences on start
-        loadSavedImage();
+        setupBottomNavigation();
+    }
 
-        // Gallery Intent Button
-        btnGallery.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(intent, REQUEST_IMAGE_GALLERY);
-        });
+    private void saveProfileData() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
-        // Camera Intent Button
-        btnCamera.setOnClickListener(v -> {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(intent, REQUEST_IMAGE_CAMERA);
-            } else {
-                Toast.makeText(this, "Camera not available", Toast.LENGTH_SHORT).show();
-            }
-        });
+        editor.putString("name", etName.getText().toString().trim());
+        editor.putString("fatherName", etFatherName.getText().toString().trim());
+        editor.putString("motherName", etMotherName.getText().toString().trim());
+        editor.putString("hobby", etHobby.getText().toString().trim());
 
-        // Implicit Intent: Open Browser
-        btnOpenBrowser.setOnClickListener(v -> {
-            Uri webpage = Uri.parse("https://diu.ac"); // Dhaka International University website
-            Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-            startActivity(intent);
-        });
+        editor.putString("email", etEmail.getText().toString().trim());
+        editor.putString("phone", etPhone.getText().toString().trim());
+        editor.putString("birthday", etBirthday.getText().toString().trim());
+        editor.putString("blood", etBloodGroup.getText().toString().trim());
+        editor.putString("parentContact", etParentContact.getText().toString().trim());
+        editor.putString("presentAddress", etPresentAddress.getText().toString().trim());
+        editor.putString("permanentAddress", etPermanentAddress.getText().toString().trim());
+        editor.putString("batch", etBatch.getText().toString().trim());
+        editor.putString("roll", etRoll.getText().toString().trim());
+        editor.putString("department", etDepartment.getText().toString().trim());
+        editor.putString("university", etUniversity.getText().toString().trim());
+        editor.apply();
+    }
 
-        // Implicit Intent: Open Email App
-        btnOpenEmail.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse("mailto:support@studymate.com"));
-            intent.putExtra(Intent.EXTRA_SUBJECT, "StudyMate Support Query");
-            intent.putExtra(Intent.EXTRA_TEXT, "Hello StudyMate Team, \n\n");
+    private void saveImageUriToPrefs(String uriStr) {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        prefs.edit().putString("imageUri", uriStr).apply();
+    }
+
+    private void loadProfileData() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
+        etName.setText(prefs.getString("name", ""));
+        etFatherName.setText(prefs.getString("fatherName", ""));
+        etMotherName.setText(prefs.getString("motherName", ""));
+        etHobby.setText(prefs.getString("hobby", ""));
+
+        etEmail.setText(prefs.getString("email", ""));
+        etPhone.setText(prefs.getString("phone", ""));
+        etBirthday.setText(prefs.getString("birthday", ""));
+        etBloodGroup.setText(prefs.getString("blood", ""));
+        etParentContact.setText(prefs.getString("parentContact", ""));
+        etPresentAddress.setText(prefs.getString("presentAddress", ""));
+        etPermanentAddress.setText(prefs.getString("permanentAddress", ""));
+        etBatch.setText(prefs.getString("batch", ""));
+        etRoll.setText(prefs.getString("roll", ""));
+        etDepartment.setText(prefs.getString("department", ""));
+        etUniversity.setText(prefs.getString("university", ""));
+
+        String savedUriStr = prefs.getString("imageUri", "");
+        if (!savedUriStr.isEmpty()) {
             try {
-                startActivity(intent);
+                profileImageUri = Uri.parse(savedUriStr);
+                ivProfileImage.setImageURI(profileImageUri);
             } catch (Exception e) {
-                Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Back to Home Intent
-        btnBackToHome.setOnClickListener(v -> {
-            Intent mainIntent = new Intent(ProfileActivity.this, MainActivity.class);
-            startActivity(mainIntent);
-            finish();
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK && data != null) {
-            if (requestCode == REQUEST_IMAGE_GALLERY) {
-                try {
-                    Uri imageUri = data.getData();
-                    ivProfilePic.setImageURI(imageUri);
-
-                    InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    saveImageToPreferences(bitmap);
-
-                    Toast.makeText(this, "Profile picture saved successfully!", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Toast.makeText(this, "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            } else if (requestCode == REQUEST_IMAGE_CAMERA) {
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    ivProfilePic.setImageBitmap(imageBitmap);
-
-                    saveImageToPreferences(imageBitmap);
-
-                    Toast.makeText(this, "Camera photo saved successfully!", Toast.LENGTH_SHORT).show();
-                }
+                e.printStackTrace();
             }
         }
     }
 
-    private void saveImageToPreferences(Bitmap bitmap) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-            byte[] imageBytes = baos.toByteArray();
-            String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+    private void setupBottomNavigation() {
+        Button navHome = findViewById(R.id.navHome);
+        Button navTasks = findViewById(R.id.navTasks);
+        Button navProfile = findViewById(R.id.navProfile);
+        Button navLogout = findViewById(R.id.navLogout);
 
-            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(KEY_PROFILE_IMAGE, encodedImage);
-            editor.apply();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+            });
         }
-    }
-
-    private void loadSavedImage() {
-        try {
-            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-            String encodedImage = prefs.getString(KEY_PROFILE_IMAGE, null);
-            if (encodedImage != null) {
-                byte[] decodedBytes = Base64.decode(encodedImage, Base64.DEFAULT);
-                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-                ivProfilePic.setImageBitmap(decodedBitmap);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (navTasks != null) {
+            navTasks.setOnClickListener(v -> startActivity(new Intent(this, TasksActivity.class)));
+        }
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> {
+                // Already in Profile
+            });
+        }
+        if (navLogout != null) {
+            navLogout.setOnClickListener(v -> {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
         }
     }
 }

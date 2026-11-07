@@ -12,15 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AddTaskActivity extends AppCompatActivity {
 
-    private EditText etTaskTitle, etTaskDesc, etTaskDate;
-    private Spinner spinnerPriority;
-    private Button btnSaveTask;
+    private EditText etAddTaskTitle, etAddTaskDesc, etAddTaskDate;
+    private Spinner spinnerAddPriority;
+    private Button btnSaveNewTask, btnCancelNewTask;
+
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -29,52 +30,68 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        etTaskTitle = findViewById(R.id.etTaskTitle);
-        etTaskDesc = findViewById(R.id.etTaskDesc);
-        etTaskDate = findViewById(R.id.etTaskDate);
-        spinnerPriority = findViewById(R.id.spinnerPriority);
-        btnSaveTask = findViewById(R.id.btnSaveTask);
-
-        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        // Setup Priority Spinner items
+        etAddTaskTitle = findViewById(R.id.etAddTaskTitle);
+        etAddTaskDesc = findViewById(R.id.etAddTaskDesc);
+        etAddTaskDate = findViewById(R.id.etAddTaskDate);
+        spinnerAddPriority = findViewById(R.id.spinnerAddPriority);
+        btnSaveNewTask = findViewById(R.id.btnSaveNewTask);
+        btnCancelNewTask = findViewById(R.id.btnCancelNewTask);
+
+        // স্পিনারে প্রায়োরিটি অপশন সেট করা (High, Medium, Low)
         String[] priorities = {"High", "Medium", "Low"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, priorities);
-        spinnerPriority.setAdapter(adapter);
+        spinnerAddPriority.setAdapter(adapter);
 
-        btnSaveTask.setOnClickListener(v -> {
-            String title = etTaskTitle.getText().toString().trim();
-            String desc = etTaskDesc.getText().toString().trim();
-            String date = etTaskDate.getText().toString().trim();
-            String priority = spinnerPriority.getSelectedItem().toString();
-            String userId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "";
+        // অটোমেটিক আজকের তারিখ DD-MM-YYYY ফরম্যাটে ডেট বক্সে বসিয়ে দেওয়া
+        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        etAddTaskDate.setText(currentDate);
 
-            if (title.isEmpty() || desc.isEmpty() || date.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (btnSaveNewTask != null) {
+            btnSaveNewTask.setOnClickListener(v -> saveTaskToFirestore());
+        }
 
-            String taskId = UUID.randomUUID().toString();
+        if (btnCancelNewTask != null) {
+            btnCancelNewTask.setOnClickListener(v -> finish());
+        }
+    }
 
-            Map<String, Object> taskMap = new HashMap<>();
-            taskMap.put("taskId", taskId);
-            taskMap.put("taskTitle", title);
-            taskMap.put("taskDescription", desc);
-            taskMap.put("taskDate", date);
-            taskMap.put("userId", userId);
-            taskMap.put("completed", false);
-            taskMap.put("priority", priority);
+    private void saveTaskToFirestore() {
+        String title = etAddTaskTitle.getText().toString().trim();
+        String description = etAddTaskDesc.getText().toString().trim();
+        String date = etAddTaskDate.getText().toString().trim();
+        String priority = spinnerAddPriority.getSelectedItem().toString();
 
-            db.collection("Tasks").document(taskId)
-                    .set(taskMap)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Task Added Successfully", Toast.LENGTH_SHORT).show();
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        });
+        if (title.isEmpty()) {
+            Toast.makeText(this, "Please enter a task title", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (date.isEmpty()) {
+            Toast.makeText(this, "Please enter a date (DD-MM-YYYY)", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(this, "User not authenticated!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = mAuth.getCurrentUser().getUid();
+        String taskId = db.collection("tasks").document().getId();
+
+        Task newTask = new Task(taskId, userId, title, description, date, priority, false);
+
+        db.collection("tasks").document(taskId)
+                .set(newTask)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Task Added Successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to add task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

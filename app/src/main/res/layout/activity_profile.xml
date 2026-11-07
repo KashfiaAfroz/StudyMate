@@ -2,91 +2,305 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="#F5F5F5">
+    android:background="#F8F9FA"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp"
         android:gravity="center_horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Profile"
-            android:textSize="24sp"
+            android:text="My Profile"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="@color/design_default_color_primary"
+            android:textColor="#6200EE"
             android:layout_marginBottom="16dp" />
 
-        <!-- Profile ImageView -->
         <ImageView
-            android:id="@+id/ivProfilePic"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@mipmap/ic_launcher_round"
+            android:id="@+id/ivProfileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:scaleType="centerCrop"
-            android:background="@android:color/darker_gray"
-            android:layout_marginBottom="12dp"
-            android:contentDescription="Profile Picture" />
-
-        <!-- Pick from Gallery Button -->
-        <Button
-            android:id="@+id/btnGallery"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Pick Image from Gallery"
-            android:backgroundTint="@color/design_default_color_primary"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Capture from Camera Button -->
-        <Button
-            android:id="@+id/btnCamera"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Capture Photo from Camera"
-            android:backgroundTint="#388E3C"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:id="@+id/tvProfileEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Email: user@email.com"
-            android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:background="#E0E0E0"
             android:layout_marginBottom="20dp" />
 
-        <!-- Implicit Intent Buttons -->
-        <Button
-            android:id="@+id/btnOpenBrowser"
+        <!-- 1. Full Name -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Open University Website (Browser Intent)"
-            android:backgroundTint="#0288D1"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="8dp" />
+            android:text="Full Name"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your full name"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 2. Father's Name -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Father's Name"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileFatherName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter father's name"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 3. Mother's Name -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mother's Name"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileMotherName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter mother's name"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 4. Hobby -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hobby"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileHobby"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="e.g. Reading, Coding, Traveling"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 5. Email -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email Address"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter email"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 6. Phone -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phone Number"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfilePhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter phone number"
+            android:inputType="phone"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 7. Birthday -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Birthday"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileBirthday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="DD-MM-YYYY"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 8. Blood Group -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Blood Group"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileBloodGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="e.g. A+"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 9. Parent Contact -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Parent's Contact"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileParentContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter parent's contact"
+            android:inputType="phone"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 10. Present Address -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Present Address"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfilePresentAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter present address"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 11. Permanent Address -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Permanent Address"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfilePermanentAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter permanent address"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 12. Batch -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Batch"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileBatch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="e.g. 85th"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 13. Roll -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Roll / ID"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileRoll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="e.g. 27"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 14. Department -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Department"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileDepartment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="e.g. CSE"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 15. University -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="University"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/etProfileUniversity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter university name"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_marginBottom="20dp" />
 
         <Button
-            android:id="@+id/btnOpenEmail"
+            android:id="@+id/btnSaveProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Send Support Email (Email Intent)"
-            android:backgroundTint="#7B1FA2"
+            android:text="Save Profile"
+            android:backgroundTint="#4CAF50"
             android:textColor="@android:color/white"
-            android:layout_marginBottom="16dp" />
+            android:padding="14dp"
+            android:layout_marginBottom="20dp" />
 
-        <Button
-            android:id="@+id/btnBackToHome"
+        <!-- Footer Bottom Navigation -->
+        <include
+            layout="@layout/layout_bottom_nav"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Back to Home"
-            android:backgroundTint="@android:color/holo_red_dark"
-            android:textColor="@android:color/white" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </ScrollView>

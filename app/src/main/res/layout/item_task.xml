@@ -1,81 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardTaskItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
     android:layout_marginVertical="6dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="3dp">
+    app:cardCornerRadius="10dp"
+    app:cardElevation="3dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- আজকের ডেট হলে রেড অ্যালার্ট একদম ওপরে বোল্ড ও উজ্জ্বলভাবে শো করবে -->
+        <TextView
+            android:id="@+id/tvRedAlert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔥 [DUE TODAY - ACTION REQUIRED!]"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="#D32F2F"
+            android:padding="6dp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="4dp">
-
-                <TextView
-                    android:id="@+id/tvTaskTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Task Title"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-
-                <TextView
-                    android:id="@+id/tvTaskPriority"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="High"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    android:background="@android:color/holo_red_light"
-                    android:textColor="@android:color/white" />
-            </LinearLayout>
+            <CheckBox
+                android:id="@+id/cbTaskComplete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/tvTaskDesc"
-                android:layout_width="match_parent"
+                android:id="@+id/tvTaskTitle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Task Description here..."
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="4dp" />
+                android:layout_weight="1"
+                android:text="Task Title"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#212121" />
 
             <TextView
-                android:id="@+id/tvTaskDate"
-                android:layout_width="match_parent"
+                android:id="@+id/tvTaskPriority"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Due Date"
+                android:text="High"
                 android:textSize="12sp"
-                android:textColor="@color/design_default_color_primary" />
+                android:textStyle="bold"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp" />
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/cbTaskComplete"
-            android:layout_width="wrap_content"
+        <!-- ডেসক্রিপশনের জন্য বড় স্পেস -->
+        <TextView
+            android:id="@+id/tvTaskDesc"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Done"
-            android:layout_marginStart="8dp" />
+            android:text="Detailed task description and topics..."
+            android:textSize="14sp"
+            android:textColor="#555555"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tvTaskDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date: DD-MM-YYYY"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="32dp" />
 
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

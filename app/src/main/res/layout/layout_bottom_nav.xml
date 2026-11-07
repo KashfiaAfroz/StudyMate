@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#6200EE"
+    android:padding="6dp"
+    android:layout_marginTop="16dp"
+    android:elevation="8dp">
+
+    <Button
+        android:id="@+id/navHome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Home"
+        android:textSize="11sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#3700B3"
+        android:layout_marginHorizontal="2dp"
+        android:padding="4dp" />
+
+    <Button
+        android:id="@+id/navTasks"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Tasks"
+        android:textSize="11sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#3700B3"
+        android:layout_marginHorizontal="2dp"
+        android:padding="4dp" />
+
+    <Button
+        android:id="@+id/navProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Profile"
+        android:textSize="11sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#3700B3"
+        android:layout_marginHorizontal="2dp"
+        android:padding="4dp" />
+
+    <Button
+        android:id="@+id/navLogout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Logout"
+        android:textSize="11sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#D32F2F"
+        android:layout_marginHorizontal="2dp"
+        android:padding="4dp" />
+
+</LinearLayout>

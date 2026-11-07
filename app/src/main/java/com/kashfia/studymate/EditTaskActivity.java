@@ -9,13 +9,18 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class EditTaskActivity extends AppCompatActivity {
 
-    private EditText etEditTaskTitle, etEditTaskDesc, etEditTaskDate;
-    private Spinner spinnerEditPriority;
+    private EditText etTaskTitle, etTaskDesc, etTaskDate;
+    private Spinner spinnerPriority;
     private Button btnUpdateTask, btnDeleteTask;
+
     private FirebaseFirestore db;
     private String taskId;
 
@@ -24,81 +29,104 @@ public class EditTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_task);
 
-        etEditTaskTitle = findViewById(R.id.etEditTaskTitle);
-        etEditTaskDesc = findViewById(R.id.etEditTaskDesc);
-        etEditTaskDate = findViewById(R.id.etEditTaskDate);
-        spinnerEditPriority = findViewById(R.id.spinnerEditPriority);
+        db = FirebaseFirestore.getInstance();
+
+        etTaskTitle = findViewById(R.id.etTaskTitle);
+        etTaskDesc = findViewById(R.id.etTaskDesc);
+        etTaskDate = findViewById(R.id.etTaskDate);
+        spinnerPriority = findViewById(R.id.spinnerPriority);
         btnUpdateTask = findViewById(R.id.btnUpdateTask);
         btnDeleteTask = findViewById(R.id.btnDeleteTask);
 
-        db = FirebaseFirestore.getInstance();
+        // Spinner Setup
+        String[] priorities = {"Low", "Medium", "High"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, priorities);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        if (spinnerPriority != null) {
+            spinnerPriority.setAdapter(adapter);
+        }
 
-        // Setup Spinner items
-        String[] priorities = {"High", "Medium", "Low"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, priorities);
-        spinnerEditPriority.setAdapter(adapter);
+        // Intent থেকে আগের ডেটা রিসিভ করে EditText-এ বসানো
+        if (getIntent() != null) {
+            taskId = getIntent().getStringExtra("taskId");
+            String title = getIntent().getStringExtra("title");
+            String description = getIntent().getStringExtra("description");
+            String date = getIntent().getStringExtra("date");
+            String priority = getIntent().getStringExtra("priority");
 
-        // Get data passed from Intent
-        taskId = getIntent().getStringExtra("taskId");
-        String title = getIntent().getStringExtra("taskTitle");
-        String desc = getIntent().getStringExtra("taskDesc");
-        String date = getIntent().getStringExtra("taskDate");
-        String priority = getIntent().getStringExtra("taskPriority");
+            if (title != null) etTaskTitle.setText(title);
+            if (description != null) etTaskDesc.setText(description);
+            if (date != null) etTaskDate.setText(date);
 
-        // Set existing data to EditText fields
-        if (title != null) etEditTaskTitle.setText(title);
-        if (desc != null) etEditTaskDesc.setText(desc);
-        if (date != null) etEditTaskDate.setText(date);
-
-        // Set spinner selection based on existing priority
-        if (priority != null) {
-            for (int i = 0; i < priorities.length; i++) {
-                if (priorities[i].equalsIgnoreCase(priority)) {
-                    spinnerEditPriority.setSelection(i);
-                    break;
+            if (priority != null && spinnerPriority != null) {
+                for (int i = 0; i < priorities.length; i++) {
+                    if (priorities[i].equalsIgnoreCase(priority)) {
+                        spinnerPriority.setSelection(i);
+                        break;
+                    }
                 }
             }
         }
 
-        // Update Task Button Action
-        btnUpdateTask.setOnClickListener(v -> {
-            String updatedTitle = etEditTaskTitle.getText().toString().trim();
-            String updatedDesc = etEditTaskDesc.getText().toString().trim();
-            String updatedDate = etEditTaskDate.getText().toString().trim();
-            String updatedPriority = spinnerEditPriority.getSelectedItem().toString();
+        // Update Button Click
+        if (btnUpdateTask != null) {
+            btnUpdateTask.setOnClickListener(v -> updateTask());
+        }
 
-            if (updatedTitle.isEmpty() || updatedDesc.isEmpty() || updatedDate.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Delete Button Click
+        if (btnDeleteTask != null) {
+            btnDeleteTask.setOnClickListener(v -> deleteTask());
+        }
+    }
 
-            db.collection("Tasks").document(taskId)
-                    .update(
-                            "taskTitle", updatedTitle,
-                            "taskDescription", updatedDesc,
-                            "taskDate", updatedDate,
-                            "priority", updatedPriority
-                    )
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Task Updated Successfully", Toast.LENGTH_SHORT).show();
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to update: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        });
+    private void updateTask() {
+        String title = etTaskTitle.getText().toString().trim();
+        String description = etTaskDesc.getText().toString().trim();
+        String date = etTaskDate.getText().toString().trim();
+        String priority = spinnerPriority != null ? spinnerPriority.getSelectedItem().toString() : "Medium";
 
-        // Delete Task Button Action
-        btnDeleteTask.setOnClickListener(v -> {
-            db.collection("Tasks").document(taskId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Task Deleted Successfully", Toast.LENGTH_SHORT).show();
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        });
+        if (title.isEmpty()) {
+            etTaskTitle.setError("Please enter task title");
+            etTaskTitle.requestFocus();
+            return;
+        }
+
+        if (taskId == null || taskId.isEmpty()) {
+            Toast.makeText(this, "Task ID not found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Map<String, Object> taskMap = new HashMap<>();
+        taskMap.put("taskTitle", title);
+        taskMap.put("taskDescription", description);
+        taskMap.put("taskDate", date);
+        taskMap.put("priority", priority);
+
+        db.collection("tasks").document(taskId)
+                .update(taskMap)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Task updated successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to update: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void deleteTask() {
+        if (taskId == null || taskId.isEmpty()) {
+            Toast.makeText(this, "Task ID not found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        db.collection("tasks").document(taskId)
+                .delete()
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Task deleted successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 }
